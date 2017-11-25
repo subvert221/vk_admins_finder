@@ -9,7 +9,7 @@ def main():
     needs_restart = False
     if not os.path.exists(ACCOUNT_FILE):
         open(ACCOUNT_FILE, 'a').close()
-        print '{} created!'.format(ACCOUNT_FILE)
+        print f'{ACCOUNT_FILE} created!'
         needs_restart = True
     else:
         with open(ACCOUNT_FILE, 'r') as file:
@@ -27,20 +27,25 @@ def admins_find(api, vk_session, group_id):
     tools = vk_api.VkTools(vk_session)
     group_members = get_group_members(tools, group_id)
     avatars = get_all_photos(api, group_id)
+    
     if not avatars:
         print 'group has no avatars.'
         return
+    
     digits = get_digits(avatars)
     matching = find_matching(group_members, digits)
     if len(digits) == 1:
-        print 'only 1 avatar loader found. printing all possible candidates: \n{}'.format(matching)
+        print f'only 1 avatar loader found. printing all possible candidates: \n{matching}'
         return
+    
     matching_with_friends = get_friends(matching)
     matching_pairs = []
+    
     for user in matching:
         for user2 in matching_with_friends:
             if user in matching_with_friends[user2]['items'] and str(user)[-3:] != str(user2)[-3:] and {user, user2} not in matching_pairs:
                 matching_pairs.append({user, user2})
+    
     matching_pairs = [list(item) for item in matching_pairs]
     if matching_pairs:
         for item in matching_pairs:
@@ -51,15 +56,14 @@ def admins_find(api, vk_session, group_id):
     
 def auth(login, password):
     api = {}
-    vk_session = vk_api.VkApi(login, password)
     try:
-        vk_session.auth()
+        vk_session = vk_api.VkApi(login, password).auth()
         api['api'] = vk_session.get_api()
         api['vk_session'] = vk_session
         api['success'] = 1
-        print '### auth {0} success! ###'.format(login)
+        print f'### auth {login} success! ###'
     except vk_api.AuthError as error_message:
-        print '{0}: {1}'.format(self.login, str(error_message))
+        print f'{self.login}: {str(error_message)}'
         api['success'] = 0
     return api
 
@@ -73,12 +77,10 @@ def get_all_photos(api, group_id):
         return all_photos['items']
 
 def get_digits(photos):
-    digits = set([item['photo_75'].split('/')[-3][-3:] for item in photos])
-    return digits
+    return set([item['photo_75'].split('/')[-3][-3:] for item in photos])
 
 def find_matching(members, digits):
-    matching = [member for member in members if str(member)[-3:] in digits]
-    return matching
+    return [member for member in members if str(member)[-3:] in digits]
 
 def get_friends(users):
     with vk_api.VkRequestsPool(vk_session) as pool:
