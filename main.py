@@ -51,7 +51,7 @@ def admins_find(api, vk_session, group_id):
         for item in matching_pairs:
             print item
     else:
-        print 'several unconnected avatar uploaders found: \n{}'.format(matching)
+        print f'several unconnected avatar uploaders found: \n{matching}'
     
     
 def auth(login, password):
@@ -68,8 +68,7 @@ def auth(login, password):
     return api
 
 def get_group_members(tools, group_id):
-    group_members = tools.get_all('groups.getMembers', 1000, {'group_id': group_id})
-    return group_members['items']
+    return tools.get_all('groups.getMembers', 1000, {'group_id': group_id})['items']
 
 def get_all_photos(api, group_id):
     all_photos = api.photos.get(owner_id = '-{}'.format(group_id), album_id = 'profile')
