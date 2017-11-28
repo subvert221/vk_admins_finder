@@ -42,7 +42,7 @@ def admins_find(api, vk_session, group_id):
         print(f'only 1 avatar loader found. printing all possible candidates: \n{matching}')
         return
     
-    matching_with_friends = get_friends(matching)
+    matching_with_friends = get_friends(matching, vk_session)
     matching_pairs = []
     
     for user in matching:
@@ -85,7 +85,7 @@ def get_digits(photos):
 def find_matching(members, digits):
     return [member for member in members if str(member)[-3:] in digits]
 
-def get_friends(users):
+def get_friends(users, vk_session):
     with vk_api.VkRequestsPool(vk_session) as pool:
         friends = pool.method_one_param('friends.get', key='user_id', values=users)
     return friends.result
